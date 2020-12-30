@@ -6,13 +6,20 @@
 
 # useful for handling different item types with a single interface
 from itemadapter import ItemAdapter
+import scrapy
 from scrapy.pipelines.files import FilesPipeline
 from urllib.parse  import urlparse
 from scrapy import Request
 # from npr.items import NprItem
 import os
 
+from scrapy.mail import MailSender
+# class scrapy.mail.MailSender(smtphost='smtp.sina.com', mailfrom='sunxingsnake@sina.com'
+# , smtpuser='sunxingsnake', smtppass='ef2f36cd23e8cbb0', smtpport='465')
 
+global mail_list
+mail_list = []
+mailer = MailSender()
 
 
 class NprPipeline(FilesPipeline):
@@ -140,18 +147,40 @@ class txtPipeline(object):
         :return:
         '''
         delstr = ['<','>','|','*','?','\\','\"',':']
+
+
+
         for i in delstr:
             item['file_name'] = item['file_name'].replace(i,'')
+        mail_list.append(item['file_name'])
 
         self.fp = open('files/' + item['file_name']+ '.txt', 'w', encoding='utf-8')
         self.fp.write(item['file_script'])
+
         # print(item['author'], item['content'])
         return item
 
     def close_spider(self, spider):
         print('爬虫结束')
+        # mail_list = []
+        # mail_list.append(item['file_name'])
         self.fp.close()
+        settings = scrapy.settings.Settings({'MAIL_FROM': 'sunxingsnake@sina.com', 'MAIL_HOST': 'smtp.sina.com',
+                                             'MAIL_PORT': '465', 'MAIL_USER': 'sunxingsnake',
+                                             'MAIL_PASS': 'ef2f36cd23e8cbb0','MAIL_SSL':'True'}, priority='project')
+        mailer = MailSender.from_settings(settings)
+        print (mail_list)
+        print ('start mail')
+        for i in mail_list:
+            attach_name = i + '.txt'
+            mimetype = 'text/plain'
+            file_object = open('files/' + i + '.txt', 'r')
+            print(i)
+            mailer.send(to=['sunxingsnake_GupKOa@kindle.cn'], subject='convert', body='',
+                        cc=[''], attachs=[(attach_name, mimetype, file_object)], mimetype='text/plain')
+        # today_date = datetime.date.today()
 
+        #     #
 
 
 

@@ -13,7 +13,11 @@ class Npr1Spider(scrapy.Spider):
             yield scrapy.Request(url,callback=self.parse_mp3, dont_filter=True)
     def parse_mp3(self,response):
         href = response.xpath('//*[@id="primaryaudio"]//div/div[2]/ul/li[1]/a/@href').extract()[0]
-        title = response.xpath('//*[@id="main-section"]/article/div[2]/input[@type = "hidden"][1]/@value').extract()[0]
+        if response.xpath('//*[@id="main-section"]/article/div[1]/h1/a/text()').extract() == [] :
+            title = response.xpath('//*[@id="main-section"]/article/div[2]/h1/a/text()').extract()[0]
+        else:
+            title = response.xpath('//*[@id="main-section"]/article/div[1]/h1/a/text()').extract()[0]
+        # title = response.xpath('//*[@id="main-section"]/article/div[2]/input[@type = "hidden"][1]/@value').extract()[0]
         print(title)
         print(type(title))
         script = "\n".join(response.xpath('//*[@id="main-section"]/article/div[@aria-label="Transcript"]/p[not(contains(@class,"disclaimer"))]/text()').extract())
