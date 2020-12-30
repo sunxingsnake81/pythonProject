@@ -167,7 +167,7 @@ class txtPipeline(object):
         self.fp.close()
         settings = scrapy.settings.Settings({'MAIL_FROM': 'sunxingsnake@sina.com', 'MAIL_HOST': 'smtp.sina.com',
                                              'MAIL_PORT': '465', 'MAIL_USER': 'sunxingsnake',
-                                             'MAIL_PASS': 'ef2f36cd23e8cbb0','MAIL_SSL':'True'}, priority='project')
+                                             'MAIL_PASS': '******','MAIL_SSL':'True'}, priority='project')
         mailer = MailSender.from_settings(settings)
         print (mail_list)
         print ('start mail')
